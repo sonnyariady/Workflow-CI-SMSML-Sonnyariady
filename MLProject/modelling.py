@@ -2,10 +2,10 @@ import os
 import json
 import shutil
 from pathlib import Path
+from contextlib import nullcontext
 
 import kagglehub
 import mlflow
-import mlflow.tensorflow
 import mlflow.tensorflow
 
 # Enable automatic logging
@@ -16,6 +16,11 @@ import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Rescaling
 from tensorflow.keras.callbacks import EarlyStopping
+
+# Enable automatic logging
+mlflow.tensorflow.autolog()
+from contextlib import nullcontext
+
 
 SEED = 42
 IMG_SIZE = (128, 128)
@@ -132,11 +137,18 @@ def main():
     model = build_model(len(class_names))
     model.summary()
 
-    mlflow.set_tracking_uri(TRACKING_URI)
-    mlflow.set_experiment(EXPERIMENT_NAME)
-    callbacks = [EarlyStopping(monitor="val_accuracy", patience=3, restore_best_weights=True)]
+mlflow.set_tracking_uri(TRACKING_URI)
+callbacks = [EarlyStopping(monitor="val_accuracy", patience=3, restore_best_weights=True)]
 
-    with mlflow.start_run(run_name="cnn_food_classification_basic"):
+if os.getenv("MLFLOW_RUN_ID"):
+    # Jika dijalankan lewat `mlflow run`, MLflow sudah membuat active run.
+    run_context = nullcontext()
+else:
+    # Jika dijalankan langsung via `python modelling.py`, buat experiment dan run manual.
+    mlflow.set_experiment(EXPERIMENT_NAME)
+    run_context = mlflow.start_run(run_name="cnn_food_classification_basic")
+
+with run_context:
         mlflow.log_param("dataset", DATASET)
         mlflow.log_param("img_size", IMG_SIZE)
         mlflow.log_param("batch_size", BATCH_SIZE)
