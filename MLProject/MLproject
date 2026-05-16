@@ -1,0 +1,5 @@
+name: indonesian-food-classification
+
+entry_points:
+  main:
+    command: "python modelling.py"

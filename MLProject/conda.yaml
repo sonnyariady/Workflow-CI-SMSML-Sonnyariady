@@ -1,0 +1,15 @@
+name: smsml-food-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - mlflow==2.19.0
+      - kagglehub==0.3.6
+      - numpy==1.26.4
+      - pandas==2.2.2
+      - scikit-learn==1.5.2
+      - matplotlib==3.9.2
+      - pillow==10.4.0
+      - tensorflow==2.15.0
