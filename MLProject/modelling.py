@@ -137,18 +137,18 @@ def main():
     model = build_model(len(class_names))
     model.summary()
 
-mlflow.set_tracking_uri(TRACKING_URI)
-callbacks = [EarlyStopping(monitor="val_accuracy", patience=3, restore_best_weights=True)]
+    mlflow.set_tracking_uri(TRACKING_URI)
+    callbacks = [EarlyStopping(monitor="val_accuracy", patience=3, restore_best_weights=True)]
 
-if os.getenv("MLFLOW_RUN_ID"):
-    # Jika dijalankan lewat `mlflow run`, MLflow sudah membuat active run.
-    run_context = nullcontext()
-else:
-    # Jika dijalankan langsung via `python modelling.py`, buat experiment dan run manual.
-    mlflow.set_experiment(EXPERIMENT_NAME)
-    run_context = mlflow.start_run(run_name="cnn_food_classification_basic")
+    if os.getenv("MLFLOW_RUN_ID"):
+        # Jika dijalankan lewat `mlflow run`, MLflow sudah membuat active run.
+        run_context = nullcontext()
+    else:
+        # Jika dijalankan langsung via `python modelling.py`, buat experiment dan run manual.
+        mlflow.set_experiment(EXPERIMENT_NAME)
+        run_context = mlflow.start_run(run_name="cnn_food_classification_basic")
 
-with run_context:
+    with run_context:
         mlflow.log_param("dataset", DATASET)
         mlflow.log_param("img_size", IMG_SIZE)
         mlflow.log_param("batch_size", BATCH_SIZE)
